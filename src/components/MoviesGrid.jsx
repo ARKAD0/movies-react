@@ -1,14 +1,32 @@
+import { useEffect, useState } from "react";
+import { get } from "../utils/httpClient";
 import { Moviecard } from "./MovieCard";
-import movies from "./movies.json";
 import styles from "./MoviesGrid.module.css";
+import { Spinner } from "./Spinner";
 
-export function MoviesGrid(){
-    console.log(styles)
-    return (
-        <ul className={styles.moviesGrid}>
-            {movies.map((movie) => (
-            <Moviecard key={movie.id} movie={movie}/>
-            ))}
-        </ul>
-    )
+export function MoviesGrid() {
+
+  const [movies, setMovies] = useState([]);
+  const [isLoading, setisLoading] = useState(true);
+  
+
+  useEffect(() => {
+    setisLoading(true);
+    get("/discover/movie")
+      .then((data) => {
+        setMovies(data.results);
+        setisLoading(false);
+      });
+    }, []);
+
+    if (isLoading) {
+      return <Spinner/>;
+    }
+  return (
+    <ul className={styles.moviesGrid}>
+      {movies.map((movie) => (
+        <Moviecard key={movie.id} movie={movie} />
+      ))}
+    </ul>
+  );
 }
